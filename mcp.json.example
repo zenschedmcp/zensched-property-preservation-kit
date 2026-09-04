@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "zensched": {
+      "url": "https://mcp.zensched.com/mcp",
+      "headers": {
+        "Authorization": "Bearer zsc_your_key_here"
+      }
+    },
+    "preservation-ops-db": {
+      "command": "npx",
+      "args": ["-y", "easy-sqlite-mcp"],
+      "env": {
+        "SQLITE_PATH": "/ABSOLUTE/PATH/TO/preservation-ops/preservation-ops.db"
+      }
+    }
+  }
+}
