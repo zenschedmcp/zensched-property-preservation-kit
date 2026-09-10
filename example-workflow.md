@@ -75,7 +75,7 @@ form_create:
 
 ```json
 [
-  {"type": "section", "label": "Field report", "text": "Fill in before you drive off. Occupancy and condition only. Do not write occupant names, lockbox codes, gate codes, or loan numbers here — those stay with the office."},
+  {"type": "section", "label": "Field report", "text": "Fill in before you drive off. Occupancy and condition only. Do not write occupant names, lockbox codes, gate codes, or loan numbers here — those stay with the office. Capture location and time are stored with each photo when the phone can read them. They are not burned onto the image."},
   {"type": "select", "label": "Occupancy", "identifier": "occupancy", "required": true,
    "options": ["Occupied", "Vacant", "Unknown", "Inaccessible"]},
   {"type": "select", "label": "Property condition", "identifier": "property_condition", "required": true,

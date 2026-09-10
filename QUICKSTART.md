@@ -2,7 +2,7 @@
 
 Setup is about 15 minutes, once. After that everything is plain English to your AI. Each step below tells you what to do and, where relevant, exactly what to type to the AI.
 
-You need: Claude Desktop (or Cursor) and [Node.js LTS](https://nodejs.org/) installed. Nothing else.
+You need: Claude Desktop, Cursor, or Muse Code, and [Node.js LTS](https://nodejs.org/) installed. Nothing else.
 
 Before you start, read the "This is not a national-vendor portal" section of `README.md`. Short version: this kit puts every stop on your phone, GPS-stamps the visit, and captures the occupancy / field report. It does **not** submit results to Safeguard, MCS, ServiceLink, or any other portal, and it does not know HUD / investor timelines. Occupant names, lockbox codes, and gate codes stay on your computer; ZenSched sees a street address and a title like `WO 88217 - Elm St`.
 
@@ -61,7 +61,7 @@ Paste `SKILL.md` into the AI as standing instructions (Claude Desktop: a Project
 
 > We're Heartland Field Services in Independence, Missouri, Central time. It's me, Jordan Hale, jordan@example.com. Set me up.
 
-The AI saves your settings, invites **you** to ZenSched as a worker ($0.25, once; you are the inspector on the phone), calls `form_create` once (free) to build the Field Report you fill in at every property (occupancy, condition, issues, exterior photos, meters, notes; no signature pad), stores the form id so every stop gets it, and sets the check-in policy: 100 m radius, **45 minutes of slack** so an early, late, or on-the-spot punch is accepted, and a check-out reminder 15 minutes after the window. Install the app from the invitation email ([Android](https://play.google.com/store/apps/details?id=com.zensched.app) / [iOS TestFlight](https://testflight.apple.com/join/Wp51m5Yq)).
+The AI saves your settings, invites **you** to ZenSched as a worker ($0.25, once; you are the inspector on the phone), calls `form_create` once (free) to build the Field Report you fill in at every property (occupancy, condition, issues, exterior photos, meters, notes; no signature pad), stores the form id so every stop gets it, and sets the check-in policy: 100 m radius, **45 minutes of slack** so an early, late, or on-the-spot punch is accepted, and a check-out reminder 15 minutes after the window. Install the app from the invitation email ([Android](https://play.google.com/store/apps/details?id=com.zensched.app) / [iOS App Store](https://apps.apple.com/us/app/zensched/id6800081657)).
 
 If you work gated communities and rural lots: "Set the check-in radius to 200 m."
 

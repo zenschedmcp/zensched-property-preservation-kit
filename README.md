@@ -14,7 +14,7 @@ If you *are* a developer, skip to [For developers](#for-developers).
 
 - **It is not a national-vendor portal, and it does not submit to one.** Safeguard, MCS, ServiceLink, and the other national field-services platforms are how most of this work is *ordered*. This kit does not log into them, does not push occupancy results or photos into them, and does not generate a conveyance package. You still upload the photos and result codes in the portal the vendor gave you. The Field Report and the GPS punches are *your* record so you can invoice and pay inspectors from something you actually have.
 - **It does not know HUD, FHA, GSE, or investor timelines.** How many days after vacancy a first occupancy is due, when winterization is required, what "secure" means for a given client: those are yours. `orders_due_today` and `orders_overdue` are dates you typed, not a rules engine.
-- **It does not watermark photos.** ZenSched records the GPS punch coordinates and the upload time server-side, and the Field Report's exterior photos are stored with the submission, but the exported image is **not** stamped with the date, time, and coordinates. If a vendor or court later wants a readable stamp on the image itself, shoot with your phone camera's timestamp / GPS overlay turned on (or a GPS-stamp camera app) and upload *that* image.
+- **It does not watermark photos.** Each exterior / meter photo stores capture location and time **as metadata** when the phone can read them (`capture_lat`, `capture_lng`, `capture_ts`, `capture_source` — EXIF GPS first; a live camera shot can fall back to device GPS). Gallery picks without EXIF coords, screenshots, and denied location permission come back empty. Compression strips EXIF from the JPEG on S3, so those fields travel next to the file, not inside it. That is where the picture was taken. The GPS **punch** is separate: it is whether the inspector was inside the geofence. The exported image is **not** stamped with date, time, or coordinates. If a vendor or court later wants a readable stamp on the image itself, shoot with your phone camera's timestamp / GPS overlay turned on (or a GPS-stamp camera app) and upload *that* image.
 - **It is not a lockbox manager, and it is not a loan file.** Occupant names, lockbox codes, and gate codes stay on your computer. Loan numbers, borrower SSNs, and investor IDs are not stored anywhere in this kit.
 
 If any of that is a deal-breaker, this kit is not for you. If you want every vacant visit GPS-stamped at the curb, a photo report you can invoice from, and receivables you can actually chase, read on.
@@ -60,7 +60,7 @@ When you paste a work-order list, the AI extracts the client, each vendor order 
 
 ### 0. What you need
 
-- **An AI tool that supports MCP.** These instructions use Claude Desktop (Windows or Mac). Cursor works too.
+- **An AI tool that supports MCP.** These instructions use Claude Desktop (Windows or Mac). Cursor and Muse Code work too.
 - **Node.js 20 or newer.** The SQLite tool runs on it. Download the LTS installer from [nodejs.org](https://nodejs.org/) and run it with the defaults. This is the only software install.
 - You do **not** need the `sqlite3` command-line program, Python, or Git.
 
@@ -179,9 +179,9 @@ Subs are paid per visit, not by the hour. Each sub has a split: `$12 per visit` 
 ## Mobile app for inspectors
 
 - **Android:** [Google Play](https://play.google.com/store/apps/details?id=com.zensched.app)
-- **iOS:** [TestFlight](https://testflight.apple.com/join/Wp51m5Yq)
+- **iOS:** [App Store](https://apps.apple.com/us/app/zensched/id6800081657)
 
-In solo mode you invite yourself; the email arrives at your own address, you install the app, and your visit windows appear as they are created. Each one shows the address and time; you check in on arrival (GPS-verified), walk the property, fill in the Field Report with exterior photos, and check out. Subs get the same email when you add them. iOS is TestFlight for now: builds expire every 90 days and the install is unfamiliar; ask which phones your 1099s carry.
+In solo mode you invite yourself; the email arrives at your own address, you install the app, and your visit windows appear as they are created. Each one shows the address and time; you check in on arrival (GPS-verified), walk the property, fill in the Field Report with exterior photos, and check out. Subs get the same email when you add them. There is no signature step; you submit the report yourself.
 
 ## Troubleshooting
 
@@ -200,7 +200,7 @@ In solo mode you invite yourself; the email arrives at your own address, you ins
 | Sub says they visited but there is no check-in | They never punched, or the phone was elsewhere | `shift_status` says `scheduled` / `missed`, or shows a punch with a large distance; that is the answer |
 | Forgot to check out | Shift still `checked_in` | Tell the AI the real time; the 15-minute check-out reminder is already on |
 | Field Report not on the phone | Form not assigned to that place's event before the shift was created | "Attach the Field Report to Elm" (`form_assign`), then cancel and recreate the shift |
-| "Why inaccessible" shows even when Occupancy is Vacant | Conditional fields are web-only on ZenSched | Harmless; leave it blank |
+| "Why inaccessible" shows even when Occupancy is Vacant | Conditionals follow the prior answer on the phone; a leftover draft can still show them | Leave it blank if occupancy is not inaccessible |
 | A sub typed a name or a lockbox code into the notes | Briefing slipped | The AI keeps it local and flags it; remind the sub. Codes stay on your computer, not the form |
 | Same house geocoded twice | Address typed differently ("Ave" vs "Avenue", "#12" vs "Apt 12") | Tell the AI it is the same place; it merges the `places` rows and keeps one location |
 | `shift_create` fails: date outside the event | The visit is on a different day than the event (events are same-day) | The AI opens a new one-day event for that place and date (free) and retries |
@@ -232,7 +232,7 @@ If something is confusing or broken in ZenSched itself, ask the AI to call `feed
 - **`mileage`** snapshots `rate` from `settings.irs_mileage_rate` (seeded `0.70`, the 2025 IRS business rate; update yearly) and computes `deduction` by trigger. `visit_id` is nullable for supply runs.
 - `visits.zensched_shift_id`, `inspectors.zensched_worker_id`, `places.normalized_address`, `work_orders.work_order_ref`, `payouts.visit_id`, and `invoices.invoice_number` are `UNIQUE`. `PRAGMA foreign_keys = ON` is in `schema.sql` and `SKILL.md` tells the agent to run it per session. Deleting a client cascades to work orders, visits, invoices, and payouts and sets `mileage.visit_id` NULL; deleting an inspector sets `visits.inspector_id` NULL and removes their payouts; `places` is `ON DELETE RESTRICT` while work orders and visits reference it; `work_orders.completed_visit_id` is `ON DELETE SET NULL`.
 
-**Field Report form.** Created once with `form_create(title, fields_json, idempotency_key="form-field-report")`; the exact `fields_json` is in `SKILL.md` and `example-workflow.md` (byte-identical) and was validated against ZenSched's form validator (`_validate_fields`): 8 fields, all valid. Every field carries an explicit `identifier` so submission `data` keys are stable (`occupancy`, `property_condition`, `issues`, `exterior`, `utilities_meters`, `notes`, `inaccessible_reason`). Option keys are derived by ZenSched from the labels (lowercase, non-alphanumerics → `_`, truncated at 30 characters); every option label here is ≤ 30 characters, so nothing truncates: `occupancy` ∈ `occupied`, `vacant`, `unknown`, `inaccessible`; `property_condition` ∈ `secure`, `unsecure`, `damaged`; `issues` ∈ `none`, `broken_window`, `open_door`, `debris`, `lawn_overgrown`, `utilities_on`, `squatters_suspected`, `other`. One `show_if` references `occupancy` with `equals inaccessible`; the phone may show "Why inaccessible" unconditionally. Attaching is `form_assign(form_id, event_id=...)` per place-day event, once, before the first shift on that event.
+**Field Report form.** Created once with `form_create(title, fields_json, idempotency_key="form-field-report")`; the exact `fields_json` is in `SKILL.md` and `example-workflow.md` (byte-identical) and was validated against ZenSched's form validator (`_validate_fields`): 8 fields, all valid. Every field carries an explicit `identifier` so submission `data` keys are stable (`occupancy`, `property_condition`, `issues`, `exterior`, `utilities_meters`, `notes`, `inaccessible_reason`). Option keys are derived by ZenSched from the labels (lowercase, non-alphanumerics → `_`, truncated at 30 characters); every option label here is ≤ 30 characters, so nothing truncates: `occupancy` ∈ `occupied`, `vacant`, `unknown`, `inaccessible`; `property_condition` ∈ `secure`, `unsecure`, `damaged`; `issues` ∈ `none`, `broken_window`, `open_door`, `debris`, `lawn_overgrown`, `utilities_on`, `squatters_suspected`, `other`. One `show_if` references `occupancy` with `equals inaccessible`; those follow-ups work on the phone. Each photo object can carry `capture_lat` / `capture_lng` / `capture_ts` / `capture_source`. Attaching is `form_assign(form_id, event_id=...)` per place-day event, once, before the first shift on that event.
 
 **Idempotency keys.** Deterministic, derived from local IDs so a retried or re-run agent turn cannot duplicate:
 

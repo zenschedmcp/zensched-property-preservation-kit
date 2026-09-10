@@ -65,7 +65,7 @@ form_create:
 
 ```json
 [
-  {"type": "section", "label": "Field report", "text": "Fill in before you drive off. Occupancy and condition only. Do not write occupant names, lockbox codes, gate codes, or loan numbers here — those stay with the office."},
+  {"type": "section", "label": "Field report", "text": "Fill in before you drive off. Occupancy and condition only. Do not write occupant names, lockbox codes, gate codes, or loan numbers here — those stay with the office. Capture location and time are stored with each photo when the phone can read them. They are not burned onto the image."},
   {"type": "select", "label": "Occupancy", "identifier": "occupancy", "required": true,
    "options": ["Occupied", "Vacant", "Unknown", "Inaccessible"]},
   {"type": "select", "label": "Property condition", "identifier": "property_condition", "required": true,
@@ -89,7 +89,7 @@ Submission `data` comes back keyed by the identifiers above. Select and multi-se
 | `occupied`, `vacant`, `unknown` | `completed` | `completed` (you reported) |
 | `inaccessible` | `completed` | `completed` (you went and reported; the vendor still pays the occupancy fee) |
 
-Store the raw keys in `visits.occupancy` / `property_condition` / `issues` (join multi_select keys with commas). `show_if` is documented as web-only, so the phone may show "Why inaccessible" unconditionally; harmless. A submission with exterior photos bills $0.15 instead of $0.05 (the photo is required, so plan on $0.15).
+Store the raw keys in `visits.occupancy` / `property_condition` / `issues` (join multi_select keys with commas). `show_if` follow-ups work on the phone. Photo objects on the submission / `form_export` can include `capture_lat`, `capture_lng`, `capture_ts`, `capture_source`, and `capture_accuracy_m` when coords came from device GPS. That is where the picture was taken — not the check-in geofence. A submission with exterior photos bills $0.15 instead of $0.05 (the photo is required, so plan on $0.15).
 
 **Tell inspectors once, and again if it slips:** no names, no lockbox codes, no gate codes, no loan numbers in the form. "Vacant, unsecure, broken rear window, meter spinning" is right. "Maria Santos, lockbox 4481" is not.
 
