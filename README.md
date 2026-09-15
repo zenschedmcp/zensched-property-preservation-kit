@@ -204,7 +204,7 @@ In solo mode you invite yourself; the email arrives at your own address, you ins
 | A sub typed a name or a lockbox code into the notes | Briefing slipped | The AI keeps it local and flags it; remind the sub. Codes stay on your computer, not the form |
 | Same house geocoded twice | Address typed differently ("Ave" vs "Avenue", "#12" vs "Apt 12") | Tell the AI it is the same place; it merges the `places` rows and keeps one location |
 | `shift_create` fails: date outside the event | The visit is on a different day than the event (events are same-day) | The AI opens a new one-day event for that place and date (free) and retries |
-| Exterior photos have no date/time stamp on them | ZenSched does not watermark images | Turn on your camera's timestamp / GPS overlay before shooting if a vendor wants a readable stamp |
+| Gallery pick without EXIF may stamp date/time only | `stamp_photos` uses capture metadata | Live camera at the property is best for full GPS on the JPEG |
 | Mileage deduction looks off | `irs_mileage_rate` still last year's | "Set the mileage rate to 0.72"; existing trips keep their snapshot |
 | AI asks you to run SQL yourself | It does not have `SKILL.md` loaded | Re-paste `SKILL.md` as project instructions |
 
