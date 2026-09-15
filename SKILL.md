@@ -65,15 +65,15 @@ form_create:
 
 ```json
 [
-  {"type": "section", "label": "Field report", "text": "Fill in before you drive off. Occupancy and condition only. Do not write occupant names, lockbox codes, gate codes, or loan numbers here — those stay with the office. Capture location and time are stored with each photo when the phone can read them. They are not burned onto the image."},
+  {"type": "section", "label": "Field report", "text": "Fill in before you drive off. Occupancy and condition only. Do not write occupant names, lockbox codes, gate codes, or loan numbers here — those stay with the office. Compliance photo fields set `"stamp_photos": true` so exported JPEGs carry readable date, time, and GPS from capture metadata (gallery picks without EXIF may show date/time only)."},
   {"type": "select", "label": "Occupancy", "identifier": "occupancy", "required": true,
    "options": ["Occupied", "Vacant", "Unknown", "Inaccessible"]},
   {"type": "select", "label": "Property condition", "identifier": "property_condition", "required": true,
    "options": ["Secure", "Unsecure", "Damaged"]},
   {"type": "multi_select", "label": "Issues", "identifier": "issues",
    "options": ["None", "Broken window", "Open door", "Debris", "Lawn overgrown", "Utilities on", "Squatters suspected", "Other"]},
-  {"type": "photo", "label": "Exterior photos", "identifier": "exterior", "max_images": 6, "required": true},
-  {"type": "photo", "label": "Utilities / meters", "identifier": "utilities_meters", "max_images": 2},
+  {"type": "photo", "label": "Exterior photos", "identifier": "exterior", "max_images": 6, "required": true, "stamp_photos": true},
+  {"type": "photo", "label": "Utilities / meters", "identifier": "utilities_meters", "max_images": 2, "stamp_photos": true},
   {"type": "textarea", "label": "Notes", "identifier": "notes"},
   {"type": "textarea", "label": "Why inaccessible", "identifier": "inaccessible_reason",
    "show_if": {"field": "occupancy", "op": "equals", "value": "inaccessible", "action": "show"}}

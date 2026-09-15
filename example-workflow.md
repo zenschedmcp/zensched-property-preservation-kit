@@ -82,8 +82,8 @@ form_create:
    "options": ["Secure", "Unsecure", "Damaged"]},
   {"type": "multi_select", "label": "Issues", "identifier": "issues",
    "options": ["None", "Broken window", "Open door", "Debris", "Lawn overgrown", "Utilities on", "Squatters suspected", "Other"]},
-  {"type": "photo", "label": "Exterior photos", "identifier": "exterior", "max_images": 6, "required": true},
-  {"type": "photo", "label": "Utilities / meters", "identifier": "utilities_meters", "max_images": 2},
+  {"type": "photo", "label": "Exterior photos", "identifier": "exterior", "max_images": 6, "required": true, "stamp_photos": true},
+  {"type": "photo", "label": "Utilities / meters", "identifier": "utilities_meters", "max_images": 2, "stamp_photos": true},
   {"type": "textarea", "label": "Notes", "identifier": "notes"},
   {"type": "textarea", "label": "Why inaccessible", "identifier": "inaccessible_reason",
    "show_if": {"field": "occupancy", "op": "equals", "value": "inaccessible", "action": "show"}}
